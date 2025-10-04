@@ -3,7 +3,7 @@
 
 - [x] 100% Clanker free
 - [x] Written in GOat lang
-- [x] Ack's deer as the best animal
+- [x] Acknowledges deer as the best animal
 
 Created as an excuse to use the `deer.rest` domain
 
