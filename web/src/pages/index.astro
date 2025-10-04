@@ -1,0 +1,31 @@
+---
+import MainLayout from "../layouts/MainLayout.astro"
+import { Code } from 'astro:components';
+
+const json = `{
+  "img_url": "http://deer.rest/static/img/NIdOk.jpg"
+}
+`
+---
+
+<MainLayout title="deer.rest">
+	<div>
+		<section class="mb-16">
+			<h1 class="text-4xl font-bold mr-128">deer.rest</h1>
+			<p class="text-slate-900/60">A RESTful Deer API, for all your deer needs !!</p>
+		</section>
+
+		<section>
+			<h2 class="text-2xl font-bold mb-4">Endpoint</h2>
+			<div class="ml-4">
+				<a href="https://deer.rest/deer" class="text-pink-400 text-lg">api.deer.rest</a>
+				<Code
+					class="rounded-md p-4 mt-2"
+					code={json} 
+					lang="json"
+					theme="catppuccin-latte"
+					/>
+			</section>
+		</section>
+	</div>
+</MainLayout>
