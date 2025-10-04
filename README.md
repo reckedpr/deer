@@ -8,5 +8,6 @@
 Created as an excuse to use the `deer.rest` domain
 
 ## 2🏃
-prolly wanna `go build cmd/deer/main.go`
-then uh `./main` I guess, wow you run a deer api
+- slap some deeya's in `/static/img/`
+- then prolly wanna `go build cmd/deer/main.go`
+- then uh `./main` I guess, wow, you run a deer api
