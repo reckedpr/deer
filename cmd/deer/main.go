@@ -65,11 +65,7 @@ func main() {
 
 	router.Static("/static/img", "./static/img")
 
-	router.GET("/", func(c *gin.Context) {
-		c.File("./static/site/index.html")
-	})
-
-	router.GET("/deer", getDeer)
+	router.GET("/", getDeer)
 
 	router.Run("localhost:8080")
 }

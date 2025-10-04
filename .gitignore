@@ -1,2 +1,4 @@
-# live astro.js page, dist moves to /static/site
-/live-site
+.astro/
+node_modules/
+
+*.log*
