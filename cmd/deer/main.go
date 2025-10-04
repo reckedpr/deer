@@ -12,7 +12,6 @@ import (
 var deerList []Deer
 
 type Deer struct {
-	ID     int    `json:"id"`
 	ImgURL string `json:"img_url,omitempty"`
 }
 
@@ -56,9 +55,8 @@ func main() {
 		panic(err)
 	}
 
-	for i, file := range files {
+	for _, file := range files {
 		deerList = append(deerList, Deer{
-			ID:     i + 1,
 			ImgURL: "/static/img/" + filepath.Base(file),
 		})
 	}
@@ -66,7 +64,10 @@ func main() {
 	router := gin.Default()
 
 	router.Static("/static/img", "./static/img")
-	router.Static("/site", "./static/site") // TODO make it / without wildcard clashes
+
+	router.GET("/", func(c *gin.Context) {
+		c.File("./static/site/index.html")
+	})
 
 	router.GET("/deer", getDeer)
 
