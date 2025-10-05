@@ -1,6 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro"
-import { Code } from 'astro:components';
+import Endpoint from "../comps/Endpoint.astro"
+import Splash from "../comps/Splash.astro"
 
 const imgJson = `{
   "img_url": "http://deer.rest/static/img/NIdOk.jpg"
@@ -10,34 +11,20 @@ const factJson = `{
 }`
 ---
 
-<MainLayout title="deer.rest">
-	<div>
+<MainLayout title="deer.rest" >
+	<div class="mt-16 sm:mt-32 md:mt-56 mx-4">
 		<section class="mb-16">
-			<h1 class="text-4xl font-bold mr-128">deer.rest</h1>
-			<p class="text-slate-900/60">A RESTful Deer API, for all your deer needs !!</p>
+			<h1 class="text-4xl font-bold">deer.rest</h1>
+			<p class="text-slate-900/60 text-sm sm:text-base">A RESTful Deer API, because deer deserve rest</p>
 		</section>
 
 		<section>
 			<h2 class="text-2xl font-bold mb-4">Endpoints</h2>
-			<div class="ml-4 mb-8">
-				<a href="https://api.deer.rest/" class="text-pink-400 text-lg">api.deer.rest</a>
-				<Code
-					class="rounded-md p-4 mt-2"
-					code={imgJson} 
-					lang="json"
-					theme="catppuccin-latte"
-					/>
+			<div class="max-w-[calc(100vw-2rem)] sm:w-fit sm:ml-2 md:ml-4 text-sm sm:text-base">
+				<Endpoint href="https://api.deer.rest/" url="api.deer.rest" json={imgJson} />
+				<Endpoint href="https://api.deer.rest/fact" url="api.deer.rest/fact" json={factJson} />
 			</div>
-			<div class="ml-4">
-				<a href="https://api.deer.rest/fact/" class="text-pink-400 text-lg">api.deer.rest/fact</a>
-				<Code
-					class="rounded-md p-4 mt-2"
-					code={factJson} 
-					lang="json"
-					theme="catppuccin-latte"
-					/>
-			</div>
-			
 		</section>
 	</div>
+	<Splash/>
 </MainLayout>

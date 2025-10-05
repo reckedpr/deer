@@ -7,14 +7,14 @@ const { title } = Astro.props;
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<title>{title}</title>
 
 		<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 	</head>
 	<body class="bg-slate-50 text-slate-900 antialiased overflow-x-hidden cursor-default">
-		<main class="mx-auto px-4 max-w-full lg:max-w-8xl md:px-12 flex flex-col items-center mt-64">
+		<main class="flex flex-col items-center">
 			<slot />
 		</main>
 	</body>
