@@ -1,7 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro"
 import Endpoint from "../comps/Endpoint.astro"
-import Splash from "../comps/Splash.astro"
+import Splash from "../comps/Splash"
 
 const imgJson = `{
   "img_url": "http://deer.rest/static/img/NIdOk.jpg"
@@ -26,5 +26,5 @@ const factJson = `{
 			</div>
 		</section>
 	</div>
-	<Splash/>
+	<Splash client:load/>
 </MainLayout>

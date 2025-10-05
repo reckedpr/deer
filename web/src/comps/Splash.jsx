@@ -1,4 +1,5 @@
----
+import { useState } from 'react';
+
 const messages = [
   "fully open source !",
   "100% clanker free",
@@ -18,8 +19,11 @@ const messages = [
   "no dark mode 4 u"
 ];
 
-const motdMessage = messages[Math.floor(Math.random() * messages.length)];
----
-<footer class="fixed bottom-0 w-full p-2 text-center text-sm sm:text-base">
-  💌 <span class="text-slate-900/60">{motdMessage}</span>
-</footer>
+export default function SplashFooter() {
+  const [motd] = useState(() => messages[Math.floor(Math.random() * messages.length)]);
+  return (
+    <footer className="fixed bottom-0 w-full p-2 text-center text-sm sm:text-base">
+      💌 <span className="text-slate-900/60">{motd}</span>
+    </footer>
+  );
+}
