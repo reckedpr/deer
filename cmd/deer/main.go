@@ -2,12 +2,19 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	imgPath  = "./static/img"
+	factPath = "./data/facts.json"
 )
 
 var deerList []Deer
@@ -33,6 +40,14 @@ func FilePathWalkDir(root string) ([]string, error) {
 	return files, err
 }
 
+func respondError(c *gin.Context, code int, msg string, err error) {
+	if err != nil {
+		log.Printf("[ %d ] %s: %v", code, msg, err)
+	}
+	c.JSON(code, gin.H{"error": msg})
+	c.Abort()
+}
+
 func getDeer(c *gin.Context) {
 	randomIndex := rand.Intn(len(deerList))
 	deer := deerList[randomIndex]
@@ -48,10 +63,30 @@ func getDeer(c *gin.Context) {
 }
 
 func getFact(c *gin.Context) {
+	err := readFacts(factPath)
+	if err != nil {
+		respondError(c, http.StatusInternalServerError, "failed to get random fact", err)
+		return
+	}
+
 	randomIndex := rand.Intn(len(factList))
 	fact := factList[randomIndex]
 
 	c.IndentedJSON(http.StatusOK, fact)
+}
+
+func readFacts(factPath string) error {
+	factFile, err := os.ReadFile(factPath)
+	if err != nil {
+		return fmt.Errorf("failed to read fact path @ %s\n\n%s", factPath, err)
+	}
+
+	err = json.Unmarshal(factFile, &factList)
+	if err != nil {
+		return fmt.Errorf("failed to open %s\n%s", factFile, err)
+	}
+
+	return nil
 }
 
 func main() {
@@ -60,35 +95,29 @@ func main() {
 		files []string
 	)
 
-	imgDir := "./static/img"
-
-	files, err = FilePathWalkDir(imgDir)
+	files, err = FilePathWalkDir(imgPath)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, file := range files {
 		deerList = append(deerList, Deer{
-			ImgURL: "/static/img/" + filepath.Base(file),
+			ImgURL: "/img/" + filepath.Base(file),
 		})
 	}
 
-	factFile, err := os.ReadFile("data/facts.json")
-	if err != nil {
-		panic(err)
-	}
-
-	err = json.Unmarshal(factFile, &factList)
-	if err != nil {
-		panic(err)
-	}
+	readFacts(factPath)
 
 	router := gin.Default()
 
-	router.Static("/static/img", "./static/img")
+	router.Static("/img", imgPath)
 
 	router.GET("/", getDeer)
 	router.GET("/fact", getFact)
+
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.File("./web/public/favicon.ico")
+	})
 
 	router.Run("localhost:8080")
 }
