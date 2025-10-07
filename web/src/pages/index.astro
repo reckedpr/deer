@@ -3,11 +3,15 @@ import MainLayout from "../layouts/MainLayout.astro"
 import Endpoint from "../comps/Endpoint.astro"
 
 const imgJson = `{
-  "img_url": "http://api.deer.rest/img/NIdOk.jpg"
+  "img_url": "https://api.deer.rest/img/NIdOk.jpg"
 }`
+
 const factJson = `{
   "fact": "Deer communicate using body language, sounds, and scent."
 }`
+
+const imageReturn = `{ returns image directly }`
+
 ---
 
 <MainLayout title="deer.rest" >
@@ -22,6 +26,7 @@ const factJson = `{
 			<div class="max-w-[calc(100vw-2rem)] sm:w-fit sm:ml-2 md:ml-4 text-sm sm:text-base">
 				<Endpoint href="https://api.deer.rest/" url="api.deer.rest" json={imgJson} />
 				<Endpoint href="https://api.deer.rest/fact" url="api.deer.rest/fact" json={factJson} />
+				<Endpoint href="https://api.deer.rest/image" url="api.deer.rest/image" json={imageReturn}/>
 			</div>
 		</section>
 	</div>
