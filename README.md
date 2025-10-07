@@ -1,16 +1,37 @@
 # A RESTful Deer API
 
 ## 🦌 [deer.rest](https://deer.rest/)
+Created as an excuse to use the `deer.rest` domain - inspiration from [kanye.rest](https://github.com/ajzbc/kanye.rest/)
 
 - [x] 100% Clanker free
 - [x] Written in GOat lang
 - [x] Acknowledges deer as the best animal
 
-Created as an excuse to use the [deer.rest](https://deer.rest/) domain - whos inspiration came from [kanye.rest](https://github.com/ajzbc/kanye.rest/)
+*See endpoints @ [deer.rest](https://deer.rest/)
 
-## 2🏃
-- `go build cmd/deer/main.go`
-- `./main`
+## To run
+```bash
+git clone https://github.com/reckedpr/deer
+cd deer
+```
 
-Webpage in `/web` is served elsewhere (e.g. caddy)
- - Install deps `npm intall` and build `npm run build`
+Main api/server
+```bash
+go build cmd/deer/main.go
+# or preview/dev with 'go run cmd/deer/main.go'
+
+./main
+# or .\main.exe if on windows
+```
+
+Site under `/web`
+```bash
+cd web
+
+npm run install
+
+npm run build
+# or preview/dev with 'npm run dev'
+```
+
+*not a serious project, there are random bits and features throughout
