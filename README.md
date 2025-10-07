@@ -7,7 +7,7 @@ Created as an excuse to use the `deer.rest` domain - inspiration from [kanye.res
 - [x] Written in GOat lang
 - [x] Acknowledges deer as the best animal
 
-*See endpoints @ [deer.rest](https://deer.rest/)
+See endpoints @ [deer.rest](https://deer.rest/)
 
 ## To run
 ```bash
@@ -34,4 +34,6 @@ npm run build
 # or preview/dev with 'npm run dev'
 ```
 
-*not a serious project, there are random bits and features throughout
+
+> [!NOTE]  
+> not a serious project, there are random bits and features throughout
