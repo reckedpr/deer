@@ -1,119 +1,57 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
-	"math/rand"
-	"net/http"
-	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/reckedpr/deer/internal/api"
+	"github.com/reckedpr/deer/internal/models"
+	"github.com/reckedpr/deer/internal/util"
 )
-
-const (
-	imgPath  = "./static/img"
-	factPath = "./data/facts.json"
-)
-
-var deerList []Deer
-var factList []Fact
-
-type Deer struct {
-	ImgURL string `json:"img_url,omitempty"`
-}
-
-type Fact struct {
-	Text string `json:"fact"`
-}
-
-// proudly stolen from stackoverflow !
-func FilePathWalkDir(root string) ([]string, error) {
-	var files []string
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			files = append(files, path)
-		}
-		return nil
-	})
-	return files, err
-}
-
-func respondError(c *gin.Context, code int, msg string, err error) {
-	if err != nil {
-		log.Printf("[ %d ] %s: %v", code, msg, err)
-	}
-	c.JSON(code, gin.H{"error": msg})
-	c.Abort()
-}
-
-func getDeer(c *gin.Context) {
-	randomIndex := rand.Intn(len(deerList))
-	deer := deerList[randomIndex]
-
-	scheme := "http"
-	if c.Request.TLS != nil {
-		scheme = "https"
-	}
-	host := c.Request.Host
-	deer.ImgURL = scheme + "://" + host + deer.ImgURL
-
-	c.IndentedJSON(http.StatusOK, deer)
-}
-
-func getFact(c *gin.Context) {
-	err := readFacts(factPath)
-	if err != nil {
-		respondError(c, http.StatusInternalServerError, "failed to get random fact", err)
-		return
-	}
-
-	randomIndex := rand.Intn(len(factList))
-	fact := factList[randomIndex]
-
-	c.IndentedJSON(http.StatusOK, fact)
-}
-
-func readFacts(factPath string) error {
-	factFile, err := os.ReadFile(factPath)
-	if err != nil {
-		return fmt.Errorf("failed to read fact path @ %s\n\n%s", factPath, err)
-	}
-
-	err = json.Unmarshal(factFile, &factList)
-	if err != nil {
-		return fmt.Errorf("failed to open %s\n%s", factFile, err)
-	}
-
-	return nil
-}
 
 func main() {
+	factData := models.Fact{
+		FactPath: "./data/facts.json",
+	}
+
+	imageObject := models.Image{
+		ImgPath: "./static/img",
+	}
+
 	var (
-		err   error
 		files []string
+		err   error
 	)
 
-	files, err = FilePathWalkDir(imgPath)
+	files, err = util.FilePathWalkDir(imageObject.ImgPath)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to read images from %s\n%s", imageObject.ImgPath, err)
 	}
 
 	for _, file := range files {
-		deerList = append(deerList, Deer{
+		imageObject.ImgList = append(imageObject.ImgList, models.ImgJson{
 			ImgURL: "/img/" + filepath.Base(file),
 		})
 	}
 
-	readFacts(factPath)
+	api.ReadFacts(&factData)
 
 	router := gin.Default()
 
-	router.Static("/img", imgPath)
+	router.Static("/img", imageObject.ImgPath)
 
-	router.GET("/", getDeer)
-	router.GET("/fact", getFact)
+	router.GET("/", func(c *gin.Context) {
+		api.ReturnImageJSON(c, &imageObject)
+	})
+
+	router.GET("/image", func(c *gin.Context) {
+		api.ReturnImage(c, &imageObject)
+	})
+
+	router.GET("/fact", func(c *gin.Context) {
+		api.ReturnFactJSON(c, &factData)
+	})
 
 	router.GET("/favicon.ico", func(c *gin.Context) {
 		c.File("./web/public/favicon.ico")
