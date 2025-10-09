@@ -15,7 +15,8 @@ type FactJson struct {
 }
 
 type Fact struct {
-	FactJson FactJson
-	FactList []FactJson
-	FactPath string
+	FactJson     FactJson
+	FactList     []FactJson
+	FactPath     string
+	FactFileSize int64
 }

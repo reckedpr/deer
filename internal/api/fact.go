@@ -2,38 +2,51 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/reckedpr/deer/internal/models"
+	"go.uber.org/zap"
 )
 
-func ReturnFactJSON(c *gin.Context, factData *models.Fact) {
-	err := ReadFacts(factData)
+func ReturnFactJSON(c *gin.Context, factObject *models.Fact) {
+	file, err := os.Stat(factObject.FactPath)
 	if err != nil {
-		ReturnError(c, http.StatusInternalServerError, "failed to refetch random facts", err)
-		return
+		zap.S().Errorw("Unable to get FileInfo", "filepath", factObject.FactPath)
 	}
 
-	randomIndex := rand.Intn(len(factData.FactList))
-	chosenFact := factData.FactList[randomIndex]
+	if file.Size() != factObject.FactFileSize {
+		zap.S().Infow("Updating fact list", "file", factObject.FactPath)
+		err = ReadFacts(factObject)
+		if err != nil {
+			ReturnError(c, http.StatusInternalServerError, "failed to refetch random facts", err)
+			zap.S().Errorw("Failed to read facts", "file", factObject.FactPath, "error", err)
+			return
+		}
+		factObject.FactFileSize = file.Size()
+	}
+
+	randomIndex := rand.Intn(len(factObject.FactList))
+	chosenFact := factObject.FactList[randomIndex]
 
 	c.IndentedJSON(http.StatusOK, chosenFact)
 }
 
-func ReadFacts(factData *models.Fact) error {
-	factFile, err := os.ReadFile(factData.FactPath)
+func ReadFacts(factObject *models.Fact) error {
+	factFile, err := os.ReadFile(factObject.FactPath)
 	if err != nil {
-		return fmt.Errorf("failed to read fact path @ %s\n\n%s", factData.FactPath, err)
+		zap.S().Errorw("Failed to ReadFile", "file", factObject.FactPath, "error", err)
+		return err
 	}
 
-	err = json.Unmarshal(factFile, &factData.FactList)
+	err = json.Unmarshal(factFile, &factObject.FactList)
 	if err != nil {
-		return fmt.Errorf("failed to open %s\n%s", factFile, err)
+		zap.S().Errorw("Failed to unmarhsal json", "file", factObject.FactPath, "error", err)
+		return err
 	}
 
+	zap.S().Infow("Fact file loaded", "file", factObject.FactPath, "amount", len(factObject.FactList))
 	return nil
 }

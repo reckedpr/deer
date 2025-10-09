@@ -1,17 +1,28 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/reckedpr/deer/internal/api"
+	"github.com/reckedpr/deer/internal/middleware"
 	"github.com/reckedpr/deer/internal/models"
 	"github.com/reckedpr/deer/internal/util"
+	"go.uber.org/zap"
 )
 
+func init() {
+	logger := zap.Must(zap.NewProduction())
+	zap.ReplaceGlobals(logger)
+}
+
 func main() {
-	factData := models.Fact{
+	const port int = 8080
+
+	listenAddr := fmt.Sprintf(":%d", port)
+
+	factObject := models.Fact{
 		FactPath: "./data/facts.json",
 	}
 
@@ -19,14 +30,11 @@ func main() {
 		ImgPath: "./static/img",
 	}
 
-	var (
-		files []string
-		err   error
-	)
+	zap.S().Infow("Starting Deer API Server")
 
-	files, err = util.FilePathWalkDir(imageObject.ImgPath)
+	files, err := util.FilePathWalkDir(imageObject.ImgPath)
 	if err != nil {
-		log.Fatalf("failed to read images from %s\n%s", imageObject.ImgPath, err)
+		zap.S().Fatalw("Failed to read images", "path", imageObject.ImgPath, "err", err)
 	}
 
 	for _, file := range files {
@@ -35,12 +43,25 @@ func main() {
 		})
 	}
 
-	api.ReadFacts(&factData)
+	zap.S().Infow("Loaded images", "path", imageObject.ImgPath, "amount", len(imageObject.ImgList))
 
-	router := gin.Default()
+	api.ReadFacts(&factObject)
 
+	// init
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
+	router.SetTrustedProxies(nil)
+
+	router.Use(middleware.GinZapMiddleware(), gin.Recovery())
+
+	// qol
 	router.Static("/img", imageObject.ImgPath)
 
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.File("./web/public/favicon.ico")
+	})
+
+	// endpoints
 	router.GET("/", func(c *gin.Context) {
 		api.ReturnImageJSON(c, &imageObject)
 	})
@@ -50,12 +71,9 @@ func main() {
 	})
 
 	router.GET("/fact", func(c *gin.Context) {
-		api.ReturnFactJSON(c, &factData)
+		api.ReturnFactJSON(c, &factObject)
 	})
 
-	router.GET("/favicon.ico", func(c *gin.Context) {
-		c.File("./web/public/favicon.ico")
-	})
-
-	router.Run("localhost:8080")
+	zap.S().Infow("Router starting", "addr", listenAddr)
+	router.Run(listenAddr)
 }
