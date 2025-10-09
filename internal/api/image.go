@@ -9,8 +9,7 @@ import (
 )
 
 func ReturnImageJSON(c *gin.Context, imgObject *models.Image) {
-	randomIndex := rand.Intn(len(imgObject.ImgList))
-	chosenImg := imgObject.ImgList[randomIndex]
+	chosenImg := randomImage(imgObject)
 
 	scheme := c.Request.Header.Get("X-Forwarded-Proto")
 	if scheme == "" {
@@ -28,9 +27,13 @@ func ReturnImageJSON(c *gin.Context, imgObject *models.Image) {
 }
 
 func ReturnImage(c *gin.Context, imgObject *models.Image) {
-	randomIndex := rand.Intn(len(imgObject.ImgList))
-	chosenImg := imgObject.ImgList[randomIndex]
+	chosenImg := randomImage(imgObject)
 
 	c.Header("Cache-Control", "no-store")
 	c.File("./static/" + chosenImg.ImgURL)
+}
+
+func randomImage(imgObject *models.Image) models.ImgJson {
+	randomIndex := rand.Intn(len(imgObject.ImgList))
+	return imgObject.ImgList[randomIndex]
 }
