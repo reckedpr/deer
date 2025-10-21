@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/reckedpr/deer/internal/api"
 	"github.com/reckedpr/deer/internal/middleware"
@@ -52,7 +53,15 @@ func main() {
 	router := gin.New()
 	router.SetTrustedProxies(nil)
 
-	router.Use(middleware.GinZapMiddleware(), gin.Recovery())
+	router.Use(
+		middleware.GinZapMiddleware(),
+		gin.Recovery(),
+		cors.New(cors.Config{
+			AllowOrigins: []string{"*"},
+			AllowMethods: []string{"GET"},
+			AllowHeaders: []string{"Origin"},
+		}),
+	)
 
 	// qol
 	router.Static("/img", imageObject.ImgPath)

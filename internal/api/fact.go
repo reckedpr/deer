@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/reckedpr/deer/internal/middleware"
 	"github.com/reckedpr/deer/internal/models"
 	"go.uber.org/zap"
 )
@@ -31,6 +32,7 @@ func ReturnFactJSON(c *gin.Context, factObject *models.Fact) {
 	randomIndex := rand.Intn(len(factObject.FactList))
 	chosenFact := factObject.FactList[randomIndex]
 
+	middleware.NoCacheHeaders(c)
 	c.IndentedJSON(http.StatusOK, chosenFact)
 }
 

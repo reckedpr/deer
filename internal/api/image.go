@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/reckedpr/deer/internal/middleware"
 	"github.com/reckedpr/deer/internal/models"
 )
 
@@ -23,13 +24,14 @@ func ReturnImageJSON(c *gin.Context, imgObject *models.Image) {
 	host := c.Request.Host
 	chosenImg.ImgURL = scheme + "://" + host + chosenImg.ImgURL
 
+	middleware.NoCacheHeaders(c)
 	c.IndentedJSON(http.StatusOK, chosenImg)
 }
 
 func ReturnImage(c *gin.Context, imgObject *models.Image) {
 	chosenImg := randomImage(imgObject)
 
-	c.Header("Cache-Control", "no-store")
+	middleware.NoCacheHeaders(c)
 	c.File("./static/" + chosenImg.ImgURL)
 }
 
