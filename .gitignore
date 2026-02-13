@@ -2,4 +2,5 @@ dist/
 .astro/
 node_modules/
 
-*.log*
+main
+deploy/
