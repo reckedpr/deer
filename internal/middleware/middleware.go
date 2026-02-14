@@ -11,7 +11,6 @@ func GinZapMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
 
 		if path == "/favicon.ico" {
 			return
@@ -21,19 +20,28 @@ func GinZapMiddleware() gin.HandlerFunc {
 
 		latency := time.Since(start)
 		status := c.Writer.Status()
+		logger := zap.S()
 
-		if raw != "" {
-			path = path + "?" + raw
-		}
-
-		zap.S().Infow("HTTP request",
+		fields := []interface{}{
 			"status", status,
 			"method", c.Request.Method,
 			"path", path,
-			"latency", latency.String(),
+			"latency", latency,
 			"clientIP", c.ClientIP(),
-			"error", c.Errors.ByType(gin.ErrorTypePrivate).String(),
-		)
+		}
+
+		if len(c.Errors) > 0 {
+			fields = append(fields, "error", c.Errors.String())
+		}
+
+		switch {
+		case status >= 500:
+			logger.Errorw("HTTP request", fields...)
+		case status >= 400:
+			logger.Warnw("HTTP request", fields...)
+		default:
+			logger.Infow("HTTP request", fields...)
+		}
 	}
 }
 
