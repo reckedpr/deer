@@ -52,6 +52,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.SetTrustedProxies(nil)
+	router.TrustedPlatform = "CF-Connecting-IP"
 
 	router.Use(
 		middleware.GinZapMiddleware(),

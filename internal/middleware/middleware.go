@@ -13,6 +13,10 @@ func GinZapMiddleware() gin.HandlerFunc {
 		path := c.Request.URL.Path
 		raw := c.Request.URL.RawQuery
 
+		if path == "/favicon.ico" {
+			return
+		}
+
 		c.Next()
 
 		latency := time.Since(start)
@@ -27,22 +31,10 @@ func GinZapMiddleware() gin.HandlerFunc {
 			"method", c.Request.Method,
 			"path", path,
 			"latency", latency.String(),
-			"clientIP", GetRealIP(c),
+			"clientIP", c.ClientIP(),
 			"error", c.Errors.ByType(gin.ErrorTypePrivate).String(),
 		)
 	}
-}
-
-func GetRealIP(c *gin.Context) string {
-	if ip := c.GetHeader("CF-Connecting-IP"); ip != "" {
-		return ip
-	}
-
-	if ip := c.GetHeader("X-Forwarded-For"); ip != "" {
-		return ip
-	}
-
-	return c.ClientIP()
 }
 
 func NoCacheHeaders(c *gin.Context) {
